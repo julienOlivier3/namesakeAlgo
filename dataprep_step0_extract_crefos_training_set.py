@@ -20,10 +20,14 @@ import pickle
 
 # # EPO - MUP Data 
 
+# +
 # Read epo to mup data
-df_epovvc = pd.read_csv(r"V:\midp\match\epo2019\epovvc2019.txt"
-                        ,sep="\t"
-                        ,encoding="utf-8")
+#df_epovvc = pd.read_csv(r"V:\midp\match\epo2019\epovvc2019.txt"
+#                        ,sep="\t"
+#                        ,encoding="utf-8")
+
+df_epovvc = pd.read_stata(r"V:\midp\match\epo2019\epo2vvc2019.dta")
+# -
 
 df_epovvc.shape
 
