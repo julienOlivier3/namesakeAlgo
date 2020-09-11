@@ -21,16 +21,20 @@ import nltk
 from nltk.corpus import stopwords
 nltk.data.path.append(r'Q:\Meine Bibliotheken\Research\Data\NLTK')
 
-df_epovvc = pd.read_pickle(r"Q:\Meine Bibliotheken\Research\Projects\Ausgründungen\02_Data\02_Webdata2IPC\df_epovvc_s1.pkl")
+df_epovvc = pd.read_pickle(r"Q:\Meine Bibliotheken\Research\Projects\Ausgründungen\02_Data\02_Webdata2IPC\df_epovvc_s1_d50&cdesc.pkl")
 
 df_epovvc.head(3)
 
-df_epovvc[['crefo', 'appln_id', 'technology', 'text']].drop_duplicates().technology.astype(str).apply(lambda x: x[:2]).value_counts()
+# Distribution ot technology classes
+df_epovvc[['crefo', 'appln_id', 'technology', 'text']].drop_duplicates().technology.astype(str).apply(lambda x: x[:2]).value_counts().plot.bar()
 
+# Shape of relevant data
 df_epovvc[['crefo', 'appln_id', 'ipc', 'text']].drop_duplicates().shape
 
+# Approach to vectorize technology classes I
 np.eye(4)[-1]
 
+# Approach to vectorize technology classes II
 np.eye(4)[np.array([i-1 for i in [0,1,3,1,1,1,1]], dtype=int)].sum(axis=0, dtype=int)
 
 
@@ -76,6 +80,8 @@ def func_extractor(df, Y, X, top_n = 3, drop_stop = True):
     df -- pandas DataFrame
     Y -- target variable
     X -- feature variable(s)
+    top_n -- number of most important technologies to consider per crefo
+    drop_stop -- drop stop words (not working reliably)
     
     Returns:
     df_train -- DataFrame including the following forms of target vectors
@@ -141,12 +147,19 @@ def func_extractor(df, Y, X, top_n = 3, drop_stop = True):
     return df_train
 
 
-df_train = func_extractor(df_epovvc, Y = 'technology', X = 'text', drop_stop = False)
+df_epovvc.head(3)
+
+df_train = func_extractor(df_epovvc, Y = 'technology', X = 'cdesc', drop_stop = False)
+
+df_train.shape
 
 df_train.loc[:,'clean_text'] = df_train.text.apply(lambda x: clean_stopword(x))
 
 df_train.head()
 
+# Reduce to y_true_up_bool
+df_train = df_train.loc[:,['y_true_up_bool', 'clean_text']]
+
 # Write data
-with open(r'Q:\Meine Bibliotheken\Research\Projects\Ausgründungen\02_Data\02_Webdata2IPC\df_train.pkl', 'wb') as f:
+with open(r'Q:\Meine Bibliotheken\Research\Projects\Ausgründungen\02_Data\02_Webdata2IPC\df_train_cdesc.pkl', 'wb') as f:
     pickle.dump(obj=df_train, file=f)
